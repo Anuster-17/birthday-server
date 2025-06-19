@@ -1,1 +1,239 @@
+<!DOCTYPE html>
+<html lang="="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎉Happy Birthday JENI Ma 💖</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+       background: #000 url('bg.jpg') no-repeat center center;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
 
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100vh;
+      z-index: 2;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #ff8, 0 0 20px #f0f; }
+      to { text-shadow: 0 0 20px #ff0, 0 0 30px #0ff; }
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.5em;
+      background: #ff69b4;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    button:hover {
+      background: #ff1493;
+    }
+
+    #cake {
+      display: none;
+      animation: pop 1s ease;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.2); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .butterfly {
+      position: absolute;
+      width: 60px;
+      animation: fly 12s infinite linear;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes fly {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(100vw, -100vh); }
+    }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      border-radius: 50%;
+      opacity: 0.9;
+      pointer-events: none;
+      animation: confetti 3s ease-in-out forwards;
+      z-index: 3;
+    }
+
+    @keyframes confetti {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    canvas#fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div class="container">
+  <h1>🎉 Happy Birthday Amma! 🎉</h1>
+  <button onclick="surprise()">🎁 Click</button>
+
+  <div id="cake-container">
+    <img id="cake" src="cake.png" alt="Birthday Cake" width="300" />
+  </div>
+</div>
+
+<!-- Butterflies -->
+<img src="butterfly.gif" class="butterfly" style="top: 10%; left: 5%;">
+<img src="butterfly.gif" class="butterfly" style="top: 50%; left: 15%;">
+<img src="butterfly.gif" class="butterfly" style="top: 30%; left: 25%; animation-delay: 2s;">
+
+<!-- Audio -->
+<audio id="music" src="birthday.mp3"></audio>
+
+<script>
+  function surprise() {
+    document.getElementById('cake').style.display = 'block';
+    document.getElementById('music').play();
+
+    for (let i = 0; i < 200; i++) {
+      let confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.width = Math.random() * 10 + 4 + 'px';
+      confetti.style.height = confetti.style.width;
+      confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
+
+      document.body.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 4000);
+    }
+  }
+
+  // Fireworks canvas animation
+  const canvas = document.getElementById("fireworks");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const fireworks = [];
+
+  class Firework {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = canvas.height;
+      this.radius = Math.random() * 3 + 2;
+      this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      this.speed = Math.random() * 3 + 2;
+      this.distance = Math.random() * 100 + 100;
+      this.exploded = false;
+      this.particles = [];
+    }
+
+    update() {
+      if (!this.exploded) {
+        this.y -= this.speed;
+        if (this.distance <= 0) {
+          this.exploded = true;
+          for (let i = 0; i < 30; i++) {
+            this.particles.push(new Particle(this.x, this.y, this.color));
+          }
+        }
+        this.distance -= this.speed;
+      }
+    }
+
+    draw() {
+      if (!this.exploded) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      } else {
+        this.particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+      }
+    }
+  }
+
+  class Particle {
+    constructor(x, y, color) {
+      this.x = x;
+      this.y = y;
+      this.radius = Math.random() * 2 + 1;
+      this.color = color;
+      this.speedX = Math.random() * 4 - 2;
+      this.speedY = Math.random() * 4 - 2;
+      this.life = 100;
+    }
+
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.life--;
+    }
+
+    draw() {
+      if (this.life > 0) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+    }
+  }
+
+  function animateFireworks() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (Math.random() < 0.05) fireworks.push(new Firework());
+    fireworks.forEach((f, index) => {
+      f.update();
+      f.draw();
+      if (f.exploded && f.particles.every(p => p.life <= 0)) {
+        fireworks.splice(index, 1);
+      }
+    });
+    requestAnimationFrame(animateFireworks);
+  }
+
+  animateFireworks();
+</script>
+
+</body>
+</html>
