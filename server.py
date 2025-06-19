@@ -1,13 +1,15 @@
-# server.py
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+from flask import Flask, send_from_directory
 
-PORT = 8000
+app = Flask(__name__)
 
-class Handler(SimpleHTTPRequestHandler):
-    def end_headers(self):
-        self.send_header('Cache-Control', 'no-store')
-        super().end_headers()
+@app.route('/')
+def home():
+    return send_from_directory('.', 'index.html')
 
-server = HTTPServer(("", PORT), Handler)
-print(f"🎉 Server running at http://localhost:{PORT}")
-server.serve_forever()
+@app.route('/<path:path>')
+def static_files(path):
+    return send_from_directory('.', path)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=10000)
+
